@@ -5,6 +5,8 @@ int num = 0;
 
 char const HTTP_404_NOT_FOUND[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n";
 
+char const HTTP_200_OK[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+
 void handle_404(int client_sock, char *path)  {
     printf("SERVER LOG: Got request for unrecognized path \"%s\"\n", path);
 
@@ -13,6 +15,9 @@ void handle_404(int client_sock, char *path)  {
     // snprintf includes a null-terminator
 
     // TODO: send response back to client?
+    write(client_sock, HTTP_404_NOT_FOUND, strlen(HTTP_404_NOT_FOUND));
+    char str[] = "404: YOUR PAGE IS NOT HERE\n";
+    write(client_sock, str, strlen(str)); 
 }
 
 
@@ -26,8 +31,14 @@ void handle_response(char *request, int client_sock) {
         printf("Invalid request line\n");
         return;
     }
-
-    handle_404(client_sock, path);
+    int result;
+    result = strcmp(path, "/shownum");
+    if (result == 0) {
+        write(client_sock, HTTP_200_OK, strlen(HTTP_200_OK));
+        char str1[] = "Your number is 0\n";
+	write(client_sock, str1, strlen(str1));
+    }	
+    
 }
 
 int main(int argc, char *argv[]) {
